@@ -20,7 +20,6 @@ const chats = [
       {
         name: "Guest User",
         email: "guest@example.com",
-        email: "guest@example.com",
       },
       {
         name: "Piyush",
