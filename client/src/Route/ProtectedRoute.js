@@ -1,18 +1,24 @@
-// src/components/ProtectedRoute.js
-
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Redirect } from "react-router-dom";
 import { ChatState } from "../Context/ChatProvider";
 
 const ProtectedRoute = ({ component: Component, ...rest }) => {
-  const { user } = ChatState(); // Get user state from context
+  const { user, loading } = ChatState();
+  console.log(user);
+  useEffect(() => {
+    if (!user || !user.token) {
+      return <Redirect to="/login" />;
+    }
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator while checking the user state
+  }
 
   return (
     <Route
       {...rest}
-      render={(props) =>
-        user ? <Component {...props} /> : <Redirect to="/login" />
-      }
+      render={(props) => (user && user.token ? <Component {...props} /> : null)}
     />
   );
 };

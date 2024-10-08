@@ -7,17 +7,26 @@ const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
   const [selectedChat, setSelectedChat] = useState();
   const [chats, setChats] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   const history = useHistory();
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     setUser(userInfo);
+    setLoading(false);
   }, [history]);
 
   return (
     <chatContext.Provider
-      value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats }}
+      value={{
+        user,
+        setUser,
+        selectedChat,
+        setSelectedChat,
+        chats,
+        setChats,
+        loading,
+      }}
     >
       {children}
     </chatContext.Provider>
