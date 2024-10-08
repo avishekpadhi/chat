@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ChatState, setLoadingChat } from "../Context/ChatProvider";
-import { Box, Stack, Text } from "@chakra-ui/layout";
-import { useToast } from "@chakra-ui/toast";
 import { AddIcon } from "@chakra-ui/icon";
 import { getSender } from "../config/ChatLogics";
-
-// import { Box, Stack, Text } from "@chakra-ui/layout";
-
 import axios from "axios";
-import { Button } from "@chakra-ui/react";
+import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 
 export default function Chats() {
