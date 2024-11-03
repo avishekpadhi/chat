@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { ChatState } from "../Context/ChatProvider";
@@ -26,10 +26,14 @@ export default function Login() {
       history.push("/chat");
     } catch (err) {
       setError("Invalid email or password");
-    } finally {
-      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      history.push("/chat");
+    }
+  }, [user, history]);
 
   return (
     <div className="">
