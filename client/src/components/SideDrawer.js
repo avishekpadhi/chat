@@ -119,14 +119,18 @@ export default function SideDrawer() {
             <DrawerHeader>Search for people</DrawerHeader>
 
             <DrawerBody>
-              <Input
-                placeholder="Type here..."
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                }}
-              />
+              <div className="flex">
+                <Input
+                  placeholder="Type here..."
+                  onChange={(event) => {
+                    setSearch(event.target.value);
+                  }}
+                />
 
-              <Button onClick={handleSubmit}>Search</Button>
+                <Button ml="4" px="6" onClick={handleSubmit}>
+                  Search
+                </Button>
+              </div>
               {loading ? (
                 <Loading />
               ) : (
