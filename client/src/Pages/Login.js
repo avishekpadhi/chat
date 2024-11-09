@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-import { ChatState } from "../Context/ChatProvider";
+import { AuthState } from "../Context/AuthProvider";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const history = useHistory();
-  const { user, setUser } = ChatState();
+  const { user, setUser } = AuthState();
 
-  const handleSubmit = async (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
     try {
@@ -22,18 +20,12 @@ export default function Login() {
       });
 
       localStorage.setItem("userInfo", JSON.stringify(response.data));
-      setUser(JSON.stringify(response.data));
+      setUser(response.data);
       history.push("/chat");
     } catch (err) {
       setError("Invalid email or password");
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      history.push("/chat");
-    }
-  }, [user, history]);
 
   return (
     <div className="">
@@ -61,7 +53,7 @@ export default function Login() {
 
               {error && <p className="mb-4 text-red-500">{error}</p>}
 
-              <form id="" className="mb-4" onSubmit={handleSubmit}>
+              <form id="" className="mb-4" onSubmit={handleLoginSubmit}>
                 <div className="mb-4">
                   <label
                     htmlFor="email"
@@ -112,9 +104,8 @@ export default function Login() {
                   <button
                     className="grid w-full cursor-pointer select-none rounded-md border border-indigo-500 bg-indigo-500 py-2 px-5 text-center align-middle text-sm text-white shadow hover:border-indigo-600 hover:bg-indigo-600 hover:text-white focus:border-indigo-600 focus:bg-indigo-600 focus:text-white focus:shadow-none"
                     type="submit"
-                    disabled={loading}
                   >
-                    {loading ? "Signing in..." : "Sign in"}
+                    Login
                   </button>
                 </div>
               </form>

@@ -6,15 +6,18 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import ChatProvider from "./Context/ChatProvider";
 import { ChakraProvider } from "@chakra-ui/react";
+import AuthProvider from "./Context/AuthProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
-    <ChatProvider>
-      <ChakraProvider>
-        <App />
-      </ChakraProvider>
-    </ChatProvider>
+    <AuthProvider>
+      <ChatProvider>
+        <ChakraProvider>
+          <App />
+        </ChakraProvider>
+      </ChatProvider>
+    </AuthProvider>
   </BrowserRouter>
 );
 
