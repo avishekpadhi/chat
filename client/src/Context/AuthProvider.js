@@ -14,9 +14,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    if (userInfo !== user) {
-      setUser(userInfo);
-    }
+    setUser(userInfo);
     if (!userInfo && location.pathname !== "/signup") history.push("/login");
   }, []);
 

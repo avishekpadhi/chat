@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { registerUser, loginUser } from "../services/service";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { AuthState } from "../Context/AuthProvider";
 
 export default function SignUp() {
+  const history = useHistory();
+  const { setUser } = AuthState();
+
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -15,14 +20,18 @@ export default function SignUp() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3000/api/user", {
-        name: formData.fullname,
-        email: formData.email,
-        password: formData.password,
-      });
+      const response = await registerUser(
+        formData.fullname,
+        formData.email,
+        formData.password
+      );
+      const userData = await loginUser(formData.email, formData.password);
+      localStorage.setItem("userInfo", JSON.stringify(userData));
+      setUser(userData);
+      history.push("/chat");
     } catch (error) {
       console.error(error);
     }
@@ -49,7 +58,7 @@ export default function SignUp() {
                 Welcome to futurism!
               </h4>
               <p className="mb-6 text-gray-500">Please sign-up to register</p>
-              <form id="" className="mb-4" onSubmit={handleSubmit}>
+              <form id="" className="mb-4" onSubmit={handleSignup}>
                 <div className="mb-4">
                   <div className="flex justify-start items-start">
                     <label

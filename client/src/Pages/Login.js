@@ -1,26 +1,22 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { AuthState } from "../Context/AuthProvider";
+import { loginUser } from "../services/service";
+
 export default function Login() {
+  const history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const history = useHistory();
-  const { user, setUser } = AuthState();
+  const { setUser } = AuthState();
 
-  const handleLoginSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
-      const response = await axios.post("http://localhost:3000/api/auth", {
-        email,
-        password,
-      });
-
-      localStorage.setItem("userInfo", JSON.stringify(response.data));
-      setUser(response.data);
+      const userData = await loginUser(email, password);
+      localStorage.setItem("userInfo", JSON.stringify(userData));
+      setUser(userData);
       history.push("/chat");
     } catch (err) {
       setError("Invalid email or password");
@@ -53,7 +49,7 @@ export default function Login() {
 
               {error && <p className="mb-4 text-red-500">{error}</p>}
 
-              <form id="" className="mb-4" onSubmit={handleLoginSubmit}>
+              <form id="" className="mb-4" onSubmit={handleLogin}>
                 <div className="mb-4">
                   <label
                     htmlFor="email"

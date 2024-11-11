@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerBody,
@@ -10,12 +10,12 @@ import {
   Button,
   useDisclosure,
   Input,
-  Spinner,
 } from "@chakra-ui/react";
-import axios from "axios";
-import { ChatState } from "../Context/ChatProvider";
+import { AuthState } from "../Context/AuthProvider";
 import Loading from "./Loading";
 import UserListItem from "./UserListItem";
+import { searchUsers, findOrCreateChat } from "../services/service";
+import { ChatState } from "../Context/ChatProvider";
 
 export default function SideDrawer() {
   const [search, setSearch] = useState("");
@@ -23,14 +23,16 @@ export default function SideDrawer() {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [placement, setPlacement] = useState("left");
 
-  const { user, setSelectedChat, setChats, chats } = ChatState();
+  const { user } = AuthState();
+  const { setSelectedChat, setChats, chats } = ChatState();
   const btnRef = React.useRef();
   const toast = useToast();
+  console.log("sidedrawer re-remdered");
 
-  const handleSubmit = async () => {
+  const handleSearch = async () => {
     if (!search) {
+      console.log("no search value");
       toast({
         title: "No search",
         description: "Enter a value to search",
@@ -38,53 +40,33 @@ export default function SideDrawer() {
         duration: 2000,
         isClosable: true,
       });
-    }
-
-    try {
-      setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
-      const { data } = await axios.get(
-        `http://localhost:3000/api/user?search=${search}`,
-        config
-      );
-      setLoading(false);
-      setSearchResult(data);
-    } catch (error) {
-      toast({
-        description: "Failed to get search results",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+    } else {
+      try {
+        setLoading(true);
+        const data = await searchUsers(search, user.token);
+        setLoading(false);
+        setSearchResult(data);
+      } catch (error) {
+        toast({
+          description: "Failed to get search results",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
     }
   };
 
   const accessChat = async (userId) => {
     try {
       setLoadingChat(true);
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
-      const { data } = await axios.post(
-        `http://localhost:3000/api/chat`,
-        { userId },
-        config
-      );
-
+      const data = await findOrCreateChat(userId, user.token);
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
       setSelectedChat(data);
       setLoadingChat(false);
       onClose();
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error fetching the chat",
         description: error.message,
@@ -93,6 +75,11 @@ export default function SideDrawer() {
         isClosable: true,
       });
     }
+  };
+
+  const handleSideBarClosing = () => {
+    setSearch("");
+    setSearchResult([""]);
   };
 
   return (
@@ -115,7 +102,7 @@ export default function SideDrawer() {
         >
           <DrawerOverlay />
           <DrawerContent>
-            <DrawerCloseButton />
+            <DrawerCloseButton onClick={handleSideBarClosing} />
             <DrawerHeader>Search for people</DrawerHeader>
 
             <DrawerBody>
@@ -127,20 +114,22 @@ export default function SideDrawer() {
                   }}
                 />
 
-                <Button ml="4" px="6" onClick={handleSubmit}>
+                <Button ml="4" px="6" onClick={handleSearch}>
                   Search
                 </Button>
               </div>
               {loading ? (
                 <Loading />
               ) : (
-                searchResult?.map((user) => (
-                  <UserListItem
-                    key={user._id}
-                    user={user}
-                    handleFunction={() => accessChat(user._id)}
-                  />
-                ))
+                <div className="mt-4">
+                  {searchResult?.map((user) => (
+                    <UserListItem
+                      key={user._id}
+                      user={user}
+                      handleFunction={() => accessChat(user._id)}
+                    />
+                  ))}
+                </div>
               )}
             </DrawerBody>
           </DrawerContent>
